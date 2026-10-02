@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors";
 import {CORS_OPTIONS} from "./security/cors.js";
 import homeRouter from "./routes/Home/Home.js";
+import taskRouter from "./routes/Task/Task.js";
 
 const app = express();
 const router = express.Router();
@@ -17,6 +18,7 @@ app.use(cookieParser());
 app.use(helmet());
 
 app.use('/', router);
+app.use('/api/task/', taskRouter);
 app.use('/api/home/', homeRouter);
 
 // Démarrage du serveur

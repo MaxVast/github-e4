@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 const initialTasks = [
   { id: 1, title: "Découvrir le projet", completed: true },
   { id: 2, title: "Créer ma première branche", completed: false },
-  { id: 3, title: "Ouvrir une Pull Request", completed: false }
+  { id: 3, title: "Ouvrir une Pull Request", completed: false },
 ];
 
 export function filterTasks(tasks, filter) {
@@ -22,7 +22,7 @@ export function createTask(title, id = Date.now()) {
   return {
     id,
     title: title.trim(),
-    completed: false
+    completed: false,
   };
 }
 
@@ -35,6 +35,8 @@ function App() {
 
   const [title, setTitle] = useState("");
   const [filter, setFilter] = useState("all");
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingTitle, setEditingTitle] = useState("");
 
   function saveTasks(nextTasks) {
     setTasks(nextTasks);
@@ -55,10 +57,8 @@ function App() {
   function toggleTask(id) {
     saveTasks(
       tasks.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task
-      )
+        task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
     );
   }
 
@@ -66,9 +66,36 @@ function App() {
     saveTasks(tasks.filter((task) => task.id !== id));
   }
 
+  function startEditing(task) {
+    setEditingTaskId(task.id);
+    setEditingTitle(task.title);
+  }
+
+  function cancelEditing() {
+    setEditingTaskId(null);
+    setEditingTitle("");
+  }
+
+  function saveEditedTask(event, id) {
+    event.preventDefault();
+
+    const trimmedTitle = editingTitle.trim();
+
+    if (!trimmedTitle) {
+      return;
+    }
+
+    saveTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, title: trimmedTitle } : task,
+      ),
+    );
+    cancelEditing();
+  }
+
   const visibleTasks = useMemo(
     () => filterTasks(tasks, filter),
-    [tasks, filter]
+    [tasks, filter],
   );
 
   const remainingCount = tasks.filter((task) => !task.completed).length;
@@ -132,23 +159,54 @@ function App() {
           ) : (
             visibleTasks.map((task) => (
               <li className="task" key={task.id}>
-                <label className={task.completed ? "completed" : ""}>
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => toggleTask(task.id)}
-                  />
-                  <span>{task.title}</span>
-                </label>
+                {editingTaskId === task.id ? (
+                  <form
+                    className="edit-form"
+                    onSubmit={(event) => saveEditedTask(event, task.id)}
+                  >
+                    <input
+                      aria-label={`Modifier ${task.title}`}
+                      value={editingTitle}
+                      onChange={(event) => setEditingTitle(event.target.value)}
+                      autoFocus
+                    />
+                    <div className="edit-actions">
+                      <button type="submit">Enregistrer</button>
+                      <button type="button" onClick={cancelEditing}>
+                        Annuler
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <label className={task.completed ? "completed" : ""}>
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={() => toggleTask(task.id)}
+                      />
+                      <span>{task.title}</span>
+                    </label>
 
-                <button
-                  className="delete"
-                  type="button"
-                  onClick={() => deleteTask(task.id)}
-                  aria-label={`Supprimer ${task.title}`}
-                >
-                  Supprimer
-                </button>
+                    <div className="task-actions">
+                      <button
+                        type="button"
+                        onClick={() => startEditing(task)}
+                        aria-label={`Modifier ${task.title}`}
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        className="delete"
+                        type="button"
+                        onClick={() => deleteTask(task.id)}
+                        aria-label={`Supprimer ${task.title}`}
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </>
+                )}
               </li>
             ))
           )}

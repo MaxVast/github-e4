@@ -42,16 +42,30 @@ export function filterTasks(tasks, filter) {
     (a, b) => Number(b.priority) - Number(a.priority),
   );
 
+  const orderedTasks = [...tasks].sort(
+    (a, b) => Number(b.priority) - Number(a.priority),
+  );
+
   if (filter === "todo") {
+    return orderedTasks.filter((task) => !task.completed);
     return orderedTasks.filter((task) => !task.completed);
   }
 
   if (filter === "done") {
     return orderedTasks.filter((task) => task.completed);
+    return orderedTasks.filter((task) => task.completed);
   }
 
   if (filter === "priority") {
     return orderedTasks.filter((task) => task.priority);
+  }
+
+  return orderedTasks;
+}
+
+export function deleteTask(id) {
+  if (window.confirm("Voulez-vous vraiment supprimer cette tâche ?")) {
+    saveTasks(tasks.filter((task) => task.id !== id));
   }
 
   return orderedTasks;
@@ -66,6 +80,7 @@ export function createTask(
     id,
     title: title.trim(),
     completed: false,
+    priority: false,
     priority: false,
   };
 
@@ -154,6 +169,7 @@ function Home() {
   function handleSubmit(event) {
     event.preventDefault();
 
+
     if (!title.trim()) {
       return;
     }
@@ -171,6 +187,14 @@ function Home() {
     saveTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    );
+  }
+
+  function togglePriority(id) {
+    saveTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, priority: !task.priority } : task,
       ),
     );
   }
@@ -299,6 +323,13 @@ function Home() {
             >
               Prioritaires
             </button>
+            <button
+              className={filter === "priority" ? "active" : ""}
+              onClick={() => setFilter("priority")}
+              type="button"
+            >
+              Prioritaires
+            </button>
           </div>
         </div>
 
@@ -307,6 +338,7 @@ function Home() {
             <li className="empty">Aucune tâche dans cette catégorie.</li>
           ) : (
             visibleTasks.map((task) => (
+              <li className={`task ${task.priority ? "important" : ""}`} key={task.id}>
               <li className={`task ${task.priority ? "important" : ""}`} key={task.id}>
                 {editingTaskId === task.id ? (
                   <form
@@ -342,8 +374,48 @@ function Home() {
                         <span className="priority-badge">Prioritaire</span>
                       )}
                     </div>
+                    <div className="task-main">
+                      <label className={task.completed ? "completed" : ""}>
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTask(task.id)}
+                        />
+                        <span>{task.title}</span>
+                      </label>
+
+                      {task.priority && (
+                        <span className="priority-badge">Prioritaire</span>
+                      )}
+                    </div>
 
                     <div className="task-actions">
+                      <button
+                        className={`priority-toggle ${task.priority ? "active" : ""}`}
+                        type="button"
+                        onClick={() => togglePriority(task.id)}
+                        aria-label={
+                          task.priority
+                            ? `Retirer la priorité à ${task.title}`
+                            : `Marquer ${task.title} comme prioritaire`
+                        }
+                      >
+                        {task.priority ? "★" : "☆"}
+                      </button>
+
+                      <button
+                        className={`priority-toggle ${task.priority ? "active" : ""}`}
+                        type="button"
+                        onClick={() => togglePriority(task.id)}
+                        aria-label={
+                          task.priority
+                            ? `Retirer la priorité à ${task.title}`
+                            : `Marquer ${task.title} comme prioritaire`
+                        }
+                      >
+                        {task.priority ? "★" : "☆"}
+                      </button>
+
                       <button
                         className={`priority-toggle ${task.priority ? "active" : ""}`}
                         type="button"
@@ -369,6 +441,7 @@ function Home() {
                       >
                         Modifier
                       </button>
+
 
                       <button
                         className="delete"

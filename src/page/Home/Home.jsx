@@ -67,6 +67,24 @@ export function createTask(
   };
 }
 
+export function countRemainingTasks(tasks) {
+  return tasks.filter((task) => !task.completed).length;
+}
+
+export function formatRemainingTasks(count) {
+  const plural = count > 1 ? "s" : "";
+  return `${count} tâche${plural} restante${plural}`;
+}
+
+export function countCompletedTasks(tasks) {
+  return tasks.filter((task) => task.completed).length;
+}
+
+export function formatCompletedTasks(count) {
+  const plural = count > 1 ? "s" : "";
+  return `${count} tâche${plural} terminée${plural}`;
+}
+
 function Home() {
   const [tasks, setTasks] = useState(loadTasks);
 
@@ -140,7 +158,8 @@ function Home() {
     [tasks, filter],
   );
 
-  const remainingCount = tasks.filter((task) => !task.completed).length;
+  const remainingCount = countRemainingTasks(tasks);
+  const completedCount = countCompletedTasks(tasks);
 
   return (
     <main className="container">
@@ -185,7 +204,10 @@ function Home() {
         </form>
 
         <div className="toolbar">
-          <strong>{remainingCount} tâche(s) restante(s)</strong>
+          <div className="counters">
+            <strong>{formatRemainingTasks(remainingCount)}</strong>
+            <span>{formatCompletedTasks(completedCount)}</span>
+          </div>
 
           <div className="filters" aria-label="Filtrer les tâches">
             <button

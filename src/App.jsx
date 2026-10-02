@@ -9,6 +9,7 @@ const initialTasks = [
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from "./page/Home/Home";
+import TaskDetail from "./page/TaskDetail/TaskDetail";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home/>} />
+        <Route path='/tasks/:id' element={<TaskDetail/>} />
       </Routes>
     </BrowserRouter>
   );

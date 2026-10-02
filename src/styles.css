@@ -301,6 +301,179 @@ button {
   border-radius: 12px;
 }
 
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(900px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 20px 0 0;
+}
+
+.topbar a {
+  color: #172033;
+  text-decoration: none;
+}
+
+.brand {
+  font-weight: 800;
+}
+
+.login-link {
+  padding: 8px 12px;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  background: #fff;
+  font-weight: 700;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-menu summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid #e4e7ec;
+  border-radius: 999px;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.user-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.user-menu-panel {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  display: grid;
+  min-width: 180px;
+  margin-top: 8px;
+  padding: 6px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 14px 40px rgb(16 24 40 / 8%);
+}
+
+.user-menu-panel a,
+.user-menu-panel button {
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #172033;
+  text-align: left;
+}
+
+.user-menu-panel a:hover,
+.user-menu-panel button:hover {
+  background: #eef2f6;
+}
+
+.user-menu-panel button {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.avatar {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: #172033;
+  color: white;
+  font-weight: 800;
+  object-fit: cover;
+}
+
+.avatar-small {
+  width: 32px;
+  height: 32px;
+  font-size: 0.8rem;
+}
+
+.avatar-large {
+  width: 88px;
+  height: 88px;
+  font-size: 1.8rem;
+}
+
+.card + .card {
+  margin-top: 20px;
+}
+
+.profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-summary h2,
+.profile-summary p {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: #667085;
+}
+
+.profile-form {
+  display: grid;
+  gap: 8px;
+}
+
+.profile-form h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+
+.profile-form label {
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.profile-form input {
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  outline: none;
+}
+
+.profile-form input:focus {
+  border-color: #667085;
+}
+
+.profile-form button {
+  justify-self: start;
+  margin-top: 12px;
+  padding: 13px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #172033;
+  color: white;
+  font-weight: 700;
+}
+
+.form-message {
+  margin: 4px 0 0;
+  color: #067647;
+  font-weight: 600;
+}
+
+.form-message.error {
+  color: #b42318;
+}
+
 footer {
   display: flex;
   justify-content: center;
@@ -329,6 +502,15 @@ footer {
   .task {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .profile-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-form button {
+    justify-self: stretch;
   }
 
   .task-main,

@@ -8,6 +8,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env.DATABASE_URL ?? "" // `mysql://${env("BDD_USER")}:${env("BDD_PASSWORD")}@${env("BDD_HOST")}:${env("BDD_PORT")}/${env("BDD_DATABASE")}`,
+    url: process.env.DATABASE_URL ?? ""
   },
 });

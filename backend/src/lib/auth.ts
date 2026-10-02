@@ -4,9 +4,15 @@ import {prisma} from "./prisma.js";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
-    provider: "postgresql",
+      provider: "mysql",
   }),
+
+  trustedOrigins: ["http://localhost:5173"],
+
+  
   emailAndPassword: { 
     enabled: true, 
-  }, 
+  },
+
+  
 });

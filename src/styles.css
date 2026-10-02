@@ -391,6 +391,52 @@ footer {
   text-decoration: none;
 }
 
+.error-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 32px 16px;
+  color: var(--text);
+}
+
+.error-content {
+  max-width: 560px;
+  text-align: center;
+}
+
+.error-code {
+  margin: 0;
+  color: var(--muted);
+  font-size: 6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.error-content h1 {
+  margin: 18px 0 10px;
+  font-size: 2rem;
+  overflow-wrap: anywhere;
+}
+
+.error-message {
+  margin: 0 0 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.error-home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .task-detail-header {
   display: flex;
   align-items: flex-start;

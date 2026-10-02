@@ -121,6 +121,28 @@ button {
   font-weight: 700;
 }
 
+.search {
+  margin-bottom: 14px;
+}
+
+.search label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.search input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  outline: none;
+}
+
+.search input:focus {
+  border-color: #667085;
+}
+
 .task-list {
   display: grid;
   gap: 8px;

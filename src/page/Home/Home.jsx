@@ -1,30 +1,12 @@
 import { useMemo, useState } from "react";
 
+import { createTask, filterTasks, searchTasks } from "../../utils/tasks";
+
 const initialTasks = [
   { id: 1, title: "Découvrir le projet", completed: true },
   { id: 2, title: "Créer ma première branche", completed: false },
   { id: 3, title: "Ouvrir une Pull Request", completed: false },
 ];
-
-export function filterTasks(tasks, filter) {
-  if (filter === "todo") {
-    return tasks.filter((task) => !task.completed);
-  }
-
-  if (filter === "done") {
-    return tasks.filter((task) => task.completed);
-  }
-
-  return tasks;
-}
-
-export function createTask(title, id = Date.now()) {
-  return {
-    id,
-    title: title.trim(),
-    completed: false,
-  };
-}
 
 function Home() {
   const [tasks, setTasks] = useState(() => {
@@ -35,6 +17,7 @@ function Home() {
 
   const [title, setTitle] = useState("");
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
 
@@ -95,8 +78,8 @@ function Home() {
   }
 
   const visibleTasks = useMemo(
-    () => filterTasks(tasks, filter),
-    [tasks, filter],
+    () => searchTasks(filterTasks(tasks, filter), search),
+    [tasks, filter, search],
   );
 
   const remainingCount = tasks.filter((task) => !task.completed).length;
@@ -154,9 +137,24 @@ function Home() {
           </div>
         </div>
 
+        <div className="search">
+          <label htmlFor="task-search">Rechercher une tâche</label>
+          <input
+            id="task-search"
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Ex. docker"
+          />
+        </div>
+
         <ul className="task-list">
           {visibleTasks.length === 0 ? (
-            <li className="empty">Aucune tâche dans cette catégorie.</li>
+            <li className="empty">
+              {search.trim()
+                ? "Aucune tâche ne correspond à la recherche."
+                : "Aucune tâche dans cette catégorie."}
+            </li>
           ) : (
             visibleTasks.map((task) => (
               <li className="task" key={task.id}>

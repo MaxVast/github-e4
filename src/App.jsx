@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./page/Home/Home";
 import Login from "./page/Login/Login";
@@ -12,6 +13,7 @@ function App() {
   return (
     <UserProvider>
       <BrowserRouter>
+        <Header />
         <Routes>
           <Route path='/a' element={<Home/>} />
           <Route path='/login' element={<Login/>} />

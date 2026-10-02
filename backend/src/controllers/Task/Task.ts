@@ -77,7 +77,8 @@ const updateOne = (req: any, res: any) => {
             },
             data: {
                 title,
-                description
+                description,
+                status
             }
         }).then((data) => {
             res.status(200).json(data);

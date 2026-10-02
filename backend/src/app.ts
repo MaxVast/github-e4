@@ -1,5 +1,5 @@
 
-import {env} from "prisma/config";
+import "dotenv/config";
 import express from 'express';
 import helmet from 'helmet';
 import cookieParser from "cookie-parser"
@@ -9,7 +9,7 @@ import homeRouter from "./routes/Home/Home.js";
 
 const app = express();
 const router = express.Router();
-const port: number = parseInt(env("PORT"));
+const port: number = parseInt(process.env.PORT as string);
 
 app.use(cors(CORS_OPTIONS));
 app.use(express.json());
@@ -19,3 +19,7 @@ app.use(helmet());
 app.use('/', router);
 app.use('/api/home/', homeRouter);
 
+// Démarrage du serveur
+app.listen(port, () => {
+    console.log(`[serveur]: Connecté avec succès sur http://127.0.0.1:${port}`);
+});

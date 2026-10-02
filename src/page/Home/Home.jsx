@@ -10,6 +10,7 @@ const initialTasks = [
     completed: true,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-01",
+    priority: false,
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ const initialTasks = [
     completed: false,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-03",
+    priority: true,
   },
   {
     id: 3,
@@ -26,6 +28,7 @@ const initialTasks = [
     completed: false,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-09",
+    priority: false,
   },
 ];
 
@@ -36,35 +39,53 @@ export function loadTasks() {
 }
 
 export function filterTasks(tasks, filter) {
+  const orderedTasks = [...tasks].sort(
+    (a, b) => Number(b.priority) - Number(a.priority),
+  );
+
   if (filter === "todo") {
-    return tasks.filter((task) => !task.completed);
+    return orderedTasks.filter((task) => !task.completed);
   }
 
   if (filter === "done") {
-    return tasks.filter((task) => task.completed);
+    return orderedTasks.filter((task) => task.completed);
   }
 
-  return tasks;
-}
-
-export function deleteTask(id) {
-  if (window.confirm("Voulez-vous vraiment supprimer cette tâche ?")) {
-    saveTasks(tasks.filter((task) => task.id !== id));
+  if (filter === "priority") {
+    return orderedTasks.filter((task) => task.priority);
   }
+
+  return orderedTasks;
 }
 
 export function createTask(
   title,
   id = Date.now(),
-  { description = "", dueDate = "", createdAt = new Date().toISOString() } = {},
+  options = {},
 ) {
-  return {
+  const task = {
     id,
     title: title.trim(),
-    description: description.trim(),
     completed: false,
-    createdAt,
+    priority: false,
+  };
+
+  const hasExtraDetails =
+    Object.prototype.hasOwnProperty.call(options, "description") ||
+    Object.prototype.hasOwnProperty.call(options, "dueDate") ||
+    Object.prototype.hasOwnProperty.call(options, "createdAt");
+
+  if (!hasExtraDetails) {
+    return task;
+  }
+
+  const { description = "", dueDate = "", createdAt = new Date().toISOString() } = options;
+
+  return {
+    ...task,
+    description: description.trim(),
     dueDate,
+    createdAt,
   };
 }
 
@@ -72,22 +93,43 @@ export function countRemainingTasks(tasks) {
   return tasks.filter((task) => !task.completed).length;
 }
 
-export function formatRemainingTasks(count) {
-  const plural = count > 1 ? "s" : "";
-  return `${count} tâche${plural} restante${plural}`;
-}
-
 export function countCompletedTasks(tasks) {
   return tasks.filter((task) => task.completed).length;
 }
 
+export function formatRemainingTasks(count) {
+  return `${count} tâche${count > 1 ? "s" : ""} restante${count > 1 ? "s" : ""}`;
+}
+
 export function formatCompletedTasks(count) {
-  const plural = count > 1 ? "s" : "";
-  return `${count} tâche${plural} terminée${plural}`;
+  return `${count} terminée${count > 1 ? "s" : ""}`;
 }
 
 function Home() {
-  const [tasks, setTasks] = useState(loadTasks);
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("team-tasks");
+
+    if (!savedTasks) {
+      return initialTasks;
+    }
+
+    try {
+      const parsedTasks = JSON.parse(savedTasks);
+
+      return Array.isArray(parsedTasks)
+        ? parsedTasks.map((task) => ({
+            ...task,
+            completed: Boolean(task.completed),
+            priority: Boolean(task.priority),
+            description: task.description ?? "",
+            dueDate: task.dueDate ?? "",
+            createdAt: task.createdAt ?? new Date().toISOString(),
+          }))
+        : initialTasks;
+    } catch {
+      return initialTasks;
+    }
+  });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -97,19 +139,30 @@ function Home() {
   const [editingTitle, setEditingTitle] = useState("");
 
   function saveTasks(nextTasks) {
-    setTasks(nextTasks);
-    localStorage.setItem("team-tasks", JSON.stringify(nextTasks));
+    const normalizedTasks = nextTasks.map((task) => ({
+      ...task,
+      completed: Boolean(task.completed),
+      priority: Boolean(task.priority),
+      description: task.description ?? "",
+      dueDate: task.dueDate ?? "",
+      createdAt: task.createdAt ?? new Date().toISOString(),
+    }));
+
+    setTasks(normalizedTasks);
+    localStorage.setItem("team-tasks", JSON.stringify(normalizedTasks));
   }
 
   function handleSubmit(event) {
-
     event.preventDefault();
-    
+
     if (!title.trim()) {
       return;
     }
 
-    saveTasks([...tasks, createTask(title, Date.now(), { description, dueDate })]);
+    saveTasks([
+      ...tasks,
+      createTask(title, Date.now(), { description, dueDate }),
+    ]);
     setTitle("");
     setDescription("");
     setDueDate("");
@@ -119,6 +172,14 @@ function Home() {
     saveTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    );
+  }
+
+  function togglePriority(id) {
+    saveTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, priority: !task.priority } : task,
       ),
     );
   }
@@ -233,6 +294,13 @@ function Home() {
             >
               Terminées
             </button>
+            <button
+              className={filter === "priority" ? "active" : ""}
+              onClick={() => setFilter("priority")}
+              type="button"
+            >
+              Prioritaires
+            </button>
           </div>
         </div>
 
@@ -241,7 +309,7 @@ function Home() {
             <li className="empty">Aucune tâche dans cette catégorie.</li>
           ) : (
             visibleTasks.map((task) => (
-              <li className="task" key={task.id}>
+              <li className={`task ${task.priority ? "important" : ""}`} key={task.id}>
                 {editingTaskId === task.id ? (
                   <form
                     className="edit-form"
@@ -254,34 +322,62 @@ function Home() {
                       autoFocus
                     />
                     <div className="edit-actions">
-                      <button type="submit">Enregistrer</button>
-                      <button type="button" onClick={cancelEditing}>
+                      <button className="edit-button" type="submit">
+                        Enregistrer
+                      </button>
+                      <button
+                        className="edit-button"
+                        type="button"
+                        onClick={cancelEditing}
+                      >
                         Annuler
                       </button>
                     </div>
                   </form>
                 ) : (
                   <>
-                    <label className={task.completed ? "completed" : ""}>
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task.id)}
-                      />
-                      <span>{task.title}</span>
-                    </label>
+                    <div className="task-main">
+                      <label className={task.completed ? "completed" : ""}>
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTask(task.id)}
+                        />
+                        <span>{task.title}</span>
+                      </label>
+
+                      {task.priority && (
+                        <span className="priority-badge">Prioritaire</span>
+                      )}
+                    </div>
 
                     <div className="task-actions">
+                      <button
+                        className={`priority-toggle ${task.priority ? "active" : ""}`}
+                        type="button"
+                        onClick={() => togglePriority(task.id)}
+                        aria-label={
+                          task.priority
+                            ? `Retirer la priorité à ${task.title}`
+                            : `Marquer ${task.title} comme prioritaire`
+                        }
+                      >
+                        {task.priority ? "★" : "☆"}
+                      </button>
+
                       <Link className="details-link" to={`/tasks/${task.id}`}>
                         Détails
                       </Link>
+
                       <button
+                        className="edit-button"
                         type="button"
                         onClick={() => startEditing(task)}
                         aria-label={`Modifier ${task.title}`}
                       >
                         Modifier
                       </button>
+
                       <button
                         className="delete"
                         type="button"

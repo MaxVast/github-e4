@@ -90,11 +90,12 @@ const updateOne = (req: any, res: any) => {
 }
 const createOne = (req: any, res: any) => {
     try {
-        const { title } = req.body;
+        const { title, userId } = req.body;
         prisma.task.create({
             data: {
                 title: req.body.title,
                 description: req.body.description,
+                userId: req.body.userId,
             }
         }).then((data) => {
             res.status(201).json(data);

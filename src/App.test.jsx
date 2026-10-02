@@ -1,21 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { createTask, filterTasks } from "./page/Home/Home";
+import { createTask, filterTasks } from "./App";
 
 describe("createTask", () => {
   it("creates an incomplete task", () => {
-    expect(
-      createTask("  Tester la CI  ", 42, {
-        description: "  Vérifier le pipeline  ",
-        dueDate: "2026-10-09",
-        createdAt: "2026-10-02T08:00:00.000Z"
-      })
-    ).toEqual({
+    expect(createTask("  Tester la CI  ", 42)).toEqual({
       id: 42,
       title: "Tester la CI",
       description: "Vérifier le pipeline",
       completed: false,
       createdAt: "2026-10-02T08:00:00.000Z",
-      dueDate: "2026-10-09"
+      dueDate: "2026-10-09",
+      priority: false
     });
   });
 });

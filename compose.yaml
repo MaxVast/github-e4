@@ -1,7 +1,8 @@
 services:
   frontend-dev:
     build:
-      context: ./docker
+      context: .
+      dockerfile: docker/Dockerfile
       target: development
     profiles: [dev]
     ports:
@@ -21,6 +22,7 @@ services:
   frontend-prod:
     build:
       context: .
+      dockerfile: docker/Dockerfile
       target: production
     profiles: [prod]
     ports:

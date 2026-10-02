@@ -1,12 +1,6 @@
-
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-
-<<<<<<< HEAD
-import Home from "./page/Home/Home";
 import TaskDetail from "./page/TaskDetail/TaskDetail";
-=======
 import Home, { createTask, filterTasks } from "./page/Home/Home";
->>>>>>> 8df695d (feat(task-priority) ajouter la priorité des tâches #25)
 
 export { createTask, filterTasks };
 

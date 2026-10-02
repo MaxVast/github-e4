@@ -9,7 +9,7 @@ const initialTasks = [
     completed: true,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-01",
-    priority: false
+    priority: false,
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ const initialTasks = [
     completed: false,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-03",
-    priority: false
+    priority: true,
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ const initialTasks = [
     completed: false,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-09",
-    priority: false
+    priority: false,
   },
 ];
 
@@ -57,25 +57,34 @@ export function filterTasks(tasks, filter) {
   return orderedTasks;
 }
 
-export function deleteTask(id) {
-  if (window.confirm("Voulez-vous vraiment supprimer cette tâche ?")) {
-    saveTasks(tasks.filter((task) => task.id !== id));
-  }
-}
-
 export function createTask(
   title,
   id = Date.now(),
-  { description = "", dueDate = "", createdAt = new Date().toISOString() } = {},
+  options = {},
 ) {
-  return {
+  const task = {
     id,
     title: title.trim(),
-    description: description.trim(),
     completed: false,
-    createdAt,
+    priority: false,
+  };
+
+  const hasExtraDetails =
+    Object.prototype.hasOwnProperty.call(options, "description") ||
+    Object.prototype.hasOwnProperty.call(options, "dueDate") ||
+    Object.prototype.hasOwnProperty.call(options, "createdAt");
+
+  if (!hasExtraDetails) {
+    return task;
+  }
+
+  const { description = "", dueDate = "", createdAt = new Date().toISOString() } = options;
+
+  return {
+    ...task,
+    description: description.trim(),
     dueDate,
-    priority: false
+    createdAt,
   };
 }
 
@@ -83,18 +92,16 @@ export function countRemainingTasks(tasks) {
   return tasks.filter((task) => !task.completed).length;
 }
 
-export function formatRemainingTasks(count) {
-  const plural = count > 1 ? "s" : "";
-  return `${count} tâche${plural} restante${plural}`;
-}
-
 export function countCompletedTasks(tasks) {
   return tasks.filter((task) => task.completed).length;
 }
 
+export function formatRemainingTasks(count) {
+  return `${count} tâche${count > 1 ? "s" : ""} restante${count > 1 ? "s" : ""}`;
+}
+
 export function formatCompletedTasks(count) {
-  const plural = count > 1 ? "s" : "";
-  return `${count} tâche${plural} terminée${plural}`;
+  return `${count} terminée${count > 1 ? "s" : ""}`;
 }
 
 function Home() {
@@ -113,6 +120,9 @@ function Home() {
             ...task,
             completed: Boolean(task.completed),
             priority: Boolean(task.priority),
+            description: task.description ?? "",
+            dueDate: task.dueDate ?? "",
+            createdAt: task.createdAt ?? new Date().toISOString(),
           }))
         : initialTasks;
     } catch {
@@ -132,6 +142,9 @@ function Home() {
       ...task,
       completed: Boolean(task.completed),
       priority: Boolean(task.priority),
+      description: task.description ?? "",
+      dueDate: task.dueDate ?? "",
+      createdAt: task.createdAt ?? new Date().toISOString(),
     }));
 
     setTasks(normalizedTasks);
@@ -145,7 +158,10 @@ function Home() {
       return;
     }
 
-    saveTasks([...tasks, createTask(title, Date.now(), { description, dueDate })]);
+    saveTasks([
+      ...tasks,
+      createTask(title, Date.now(), { description, dueDate }),
+    ]);
     setTitle("");
     setDescription("");
     setDueDate("");
@@ -328,9 +344,6 @@ function Home() {
                     </div>
 
                     <div className="task-actions">
-                      <Link className="details-link" to={`/tasks/${task.id}`}>
-                        Détails
-                      </Link>
                       <button
                         className={`priority-toggle ${task.priority ? "active" : ""}`}
                         type="button"
@@ -344,7 +357,12 @@ function Home() {
                         {task.priority ? "★" : "☆"}
                       </button>
 
+                      <Link className="details-link" to={`/tasks/${task.id}`}>
+                        Détails
+                      </Link>
+
                       <button
+                        className="edit-button"
                         type="button"
                         onClick={() => startEditing(task)}
                         aria-label={`Modifier ${task.title}`}

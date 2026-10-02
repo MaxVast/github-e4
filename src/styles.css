@@ -321,9 +321,21 @@ footer {
 }
 
 .details-link,
+.edit-button,
 .back-link {
   color: #172033;
   font-weight: 600;
+}
+
+.details-link,
+.edit-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  background: #fff;
+  text-decoration: none;
 }
 
 .back-link {

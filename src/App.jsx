@@ -63,7 +63,9 @@ function App() {
   }
 
   function deleteTask(id) {
+      if (window.confirm("Voulez-vous vraiment supprimer cette tâche ?")) {
     saveTasks(tasks.filter((task) => task.id !== id));
+    }
   }
 
   const visibleTasks = useMemo(

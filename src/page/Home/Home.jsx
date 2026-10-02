@@ -9,6 +9,7 @@ const initialTasks = [
     completed: true,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-01",
+    priority: false
   },
   {
     id: 2,
@@ -17,6 +18,7 @@ const initialTasks = [
     completed: false,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-03",
+    priority: false
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ const initialTasks = [
     completed: false,
     createdAt: "2026-10-01T09:00:00.000Z",
     dueDate: "2026-10-09",
+    priority: false
   },
 ];
 
@@ -35,15 +38,23 @@ export function loadTasks() {
 }
 
 export function filterTasks(tasks, filter) {
+  const orderedTasks = [...tasks].sort(
+    (a, b) => Number(b.priority) - Number(a.priority),
+  );
+
   if (filter === "todo") {
-    return tasks.filter((task) => !task.completed);
+    return orderedTasks.filter((task) => !task.completed);
   }
 
   if (filter === "done") {
-    return tasks.filter((task) => task.completed);
+    return orderedTasks.filter((task) => task.completed);
   }
 
-  return tasks;
+  if (filter === "priority") {
+    return orderedTasks.filter((task) => task.priority);
+  }
+
+  return orderedTasks;
 }
 
 export function deleteTask(id) {
@@ -64,6 +75,7 @@ export function createTask(
     completed: false,
     createdAt,
     dueDate,
+    priority: false
   };
 }
 
@@ -86,7 +98,27 @@ export function formatCompletedTasks(count) {
 }
 
 function Home() {
-  const [tasks, setTasks] = useState(loadTasks);
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("team-tasks");
+
+    if (!savedTasks) {
+      return initialTasks;
+    }
+
+    try {
+      const parsedTasks = JSON.parse(savedTasks);
+
+      return Array.isArray(parsedTasks)
+        ? parsedTasks.map((task) => ({
+            ...task,
+            completed: Boolean(task.completed),
+            priority: Boolean(task.priority),
+          }))
+        : initialTasks;
+    } catch {
+      return initialTasks;
+    }
+  });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -96,14 +128,19 @@ function Home() {
   const [editingTitle, setEditingTitle] = useState("");
 
   function saveTasks(nextTasks) {
-    setTasks(nextTasks);
-    localStorage.setItem("team-tasks", JSON.stringify(nextTasks));
+    const normalizedTasks = nextTasks.map((task) => ({
+      ...task,
+      completed: Boolean(task.completed),
+      priority: Boolean(task.priority),
+    }));
+
+    setTasks(normalizedTasks);
+    localStorage.setItem("team-tasks", JSON.stringify(normalizedTasks));
   }
 
   function handleSubmit(event) {
-
     event.preventDefault();
-    
+
     if (!title.trim()) {
       return;
     }
@@ -118,6 +155,14 @@ function Home() {
     saveTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    );
+  }
+
+  function togglePriority(id) {
+    saveTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, priority: !task.priority } : task,
       ),
     );
   }
@@ -231,6 +276,13 @@ function Home() {
             >
               Terminées
             </button>
+            <button
+              className={filter === "priority" ? "active" : ""}
+              onClick={() => setFilter("priority")}
+              type="button"
+            >
+              Prioritaires
+            </button>
           </div>
         </div>
 
@@ -239,7 +291,7 @@ function Home() {
             <li className="empty">Aucune tâche dans cette catégorie.</li>
           ) : (
             visibleTasks.map((task) => (
-              <li className="task" key={task.id}>
+              <li className={`task ${task.priority ? "important" : ""}`} key={task.id}>
                 {editingTaskId === task.id ? (
                   <form
                     className="edit-form"
@@ -260,19 +312,38 @@ function Home() {
                   </form>
                 ) : (
                   <>
-                    <label className={task.completed ? "completed" : ""}>
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task.id)}
-                      />
-                      <span>{task.title}</span>
-                    </label>
+                    <div className="task-main">
+                      <label className={task.completed ? "completed" : ""}>
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTask(task.id)}
+                        />
+                        <span>{task.title}</span>
+                      </label>
+
+                      {task.priority && (
+                        <span className="priority-badge">Prioritaire</span>
+                      )}
+                    </div>
 
                     <div className="task-actions">
                       <Link className="details-link" to={`/tasks/${task.id}`}>
                         Détails
                       </Link>
+                      <button
+                        className={`priority-toggle ${task.priority ? "active" : ""}`}
+                        type="button"
+                        onClick={() => togglePriority(task.id)}
+                        aria-label={
+                          task.priority
+                            ? `Retirer la priorité à ${task.title}`
+                            : `Marquer ${task.title} comme prioritaire`
+                        }
+                      >
+                        {task.priority ? "★" : "☆"}
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => startEditing(task)}
@@ -280,6 +351,7 @@ function Home() {
                       >
                         Modifier
                       </button>
+
                       <button
                         className="delete"
                         type="button"

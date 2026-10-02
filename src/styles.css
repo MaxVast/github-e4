@@ -116,6 +116,7 @@ button {
 .filters {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .filters button {
@@ -150,6 +151,19 @@ button {
   border-radius: 12px;
 }
 
+.task.important {
+  border-color: #f0c866;
+  background: #fffaf0;
+}
+
+.task-main {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+}
+
 .task label {
   display: flex;
   align-items: center;
@@ -164,6 +178,65 @@ button {
 .task label.completed span {
   color: #98a2b3;
   text-decoration: line-through;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #fff4d6;
+  color: #b45309;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priority-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #667085;
+  font-size: 1.6rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.priority-toggle.active {
+  background: transparent;
+  color: #f0b429;
+}
+
+.edit-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.edit-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .delete {
@@ -196,7 +269,8 @@ footer {
   }
 
   .form-row,
-  .toolbar {
+  .toolbar,
+  .edit-form {
     align-items: stretch;
     flex-direction: column;
   }
@@ -205,8 +279,16 @@ footer {
     padding: 12px;
   }
 
-  .filters {
-    flex-wrap: wrap;
+  .task {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .task-main,
+  .task-actions,
+  .edit-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 .task-form label + label,

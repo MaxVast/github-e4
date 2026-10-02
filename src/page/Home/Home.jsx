@@ -322,8 +322,14 @@ function Home() {
                       autoFocus
                     />
                     <div className="edit-actions">
-                      <button type="submit">Enregistrer</button>
-                      <button type="button" onClick={cancelEditing}>
+                      <button className="edit-button" type="submit">
+                        Enregistrer
+                      </button>
+                      <button
+                        className="edit-button"
+                        type="button"
+                        onClick={cancelEditing}
+                      >
                         Annuler
                       </button>
                     </div>

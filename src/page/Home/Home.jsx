@@ -18,6 +18,12 @@ export function filterTasks(tasks, filter) {
   return tasks;
 }
 
+export function deleteTask(id) {
+  if (window.confirm("Voulez-vous vraiment supprimer cette tâche ?")) {
+    saveTasks(tasks.filter((task) => task.id !== id));
+  }
+}
+
 export function createTask(title, id = Date.now()) {
   return {
     id,

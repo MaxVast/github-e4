@@ -1,15 +1,14 @@
-
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import Home from "./page/Home/Home";
+import Home, { createTask, filterTasks } from "./page/Home/Home";
 
+export { createTask, filterTasks };
 
 function App() {
-
   return (
     <BrowserRouter>
-      <Routes>  
-        <Route path='/' element={<Home/>} />
+      <Routes>
+        <Route path="/" element={<Home />} />
       </Routes>
     </BrowserRouter>
   );

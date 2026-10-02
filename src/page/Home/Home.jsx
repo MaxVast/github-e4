@@ -1,21 +1,29 @@
 import { useMemo, useState } from "react";
 
 const initialTasks = [
-  { id: 1, title: "Découvrir le projet", completed: true },
-  { id: 2, title: "Créer ma première branche", completed: false },
-  { id: 3, title: "Ouvrir une Pull Request", completed: false },
+  { id: 1, title: "Découvrir le projet", completed: true, priority: false },
+  { id: 2, title: "Créer ma première branche", completed: false, priority: true },
+  { id: 3, title: "Ouvrir une Pull Request", completed: false, priority: false },
 ];
 
 export function filterTasks(tasks, filter) {
+  const orderedTasks = [...tasks].sort(
+    (a, b) => Number(b.priority) - Number(a.priority),
+  );
+
   if (filter === "todo") {
-    return tasks.filter((task) => !task.completed);
+    return orderedTasks.filter((task) => !task.completed);
   }
 
   if (filter === "done") {
-    return tasks.filter((task) => task.completed);
+    return orderedTasks.filter((task) => task.completed);
   }
 
-  return tasks;
+  if (filter === "priority") {
+    return orderedTasks.filter((task) => task.priority);
+  }
+
+  return orderedTasks;
 }
 
 export function createTask(title, id = Date.now()) {
@@ -23,6 +31,7 @@ export function createTask(title, id = Date.now()) {
     id,
     title: title.trim(),
     completed: false,
+    priority: false,
   };
 }
 
@@ -30,7 +39,23 @@ function Home() {
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem("team-tasks");
 
-    return savedTasks ? JSON.parse(savedTasks) : initialTasks;
+    if (!savedTasks) {
+      return initialTasks;
+    }
+
+    try {
+      const parsedTasks = JSON.parse(savedTasks);
+
+      return Array.isArray(parsedTasks)
+        ? parsedTasks.map((task) => ({
+            ...task,
+            completed: Boolean(task.completed),
+            priority: Boolean(task.priority),
+          }))
+        : initialTasks;
+    } catch {
+      return initialTasks;
+    }
   });
 
   const [title, setTitle] = useState("");
@@ -39,14 +64,19 @@ function Home() {
   const [editingTitle, setEditingTitle] = useState("");
 
   function saveTasks(nextTasks) {
-    setTasks(nextTasks);
-    localStorage.setItem("team-tasks", JSON.stringify(nextTasks));
+    const normalizedTasks = nextTasks.map((task) => ({
+      ...task,
+      completed: Boolean(task.completed),
+      priority: Boolean(task.priority),
+    }));
+
+    setTasks(normalizedTasks);
+    localStorage.setItem("team-tasks", JSON.stringify(normalizedTasks));
   }
 
   function handleSubmit(event) {
-
     event.preventDefault();
-    
+
     if (!title.trim()) {
       return;
     }
@@ -59,6 +89,14 @@ function Home() {
     saveTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    );
+  }
+
+  function togglePriority(id) {
+    saveTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, priority: !task.priority } : task,
       ),
     );
   }
@@ -151,6 +189,13 @@ function Home() {
             >
               Terminées
             </button>
+            <button
+              className={filter === "priority" ? "active" : ""}
+              onClick={() => setFilter("priority")}
+              type="button"
+            >
+              Prioritaires
+            </button>
           </div>
         </div>
 
@@ -159,7 +204,7 @@ function Home() {
             <li className="empty">Aucune tâche dans cette catégorie.</li>
           ) : (
             visibleTasks.map((task) => (
-              <li className="task" key={task.id}>
+              <li className={`task ${task.priority ? "important" : ""}`} key={task.id}>
                 {editingTaskId === task.id ? (
                   <form
                     className="edit-form"
@@ -180,16 +225,35 @@ function Home() {
                   </form>
                 ) : (
                   <>
-                    <label className={task.completed ? "completed" : ""}>
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task.id)}
-                      />
-                      <span>{task.title}</span>
-                    </label>
+                    <div className="task-main">
+                      <label className={task.completed ? "completed" : ""}>
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTask(task.id)}
+                        />
+                        <span>{task.title}</span>
+                      </label>
+
+                      {task.priority && (
+                        <span className="priority-badge">Prioritaire</span>
+                      )}
+                    </div>
 
                     <div className="task-actions">
+                      <button
+                        className={`priority-toggle ${task.priority ? "active" : ""}`}
+                        type="button"
+                        onClick={() => togglePriority(task.id)}
+                        aria-label={
+                          task.priority
+                            ? `Retirer la priorité à ${task.title}`
+                            : `Marquer ${task.title} comme prioritaire`
+                        }
+                      >
+                        {task.priority ? "★" : "☆"}
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => startEditing(task)}
@@ -197,6 +261,7 @@ function Home() {
                       >
                         Modifier
                       </button>
+
                       <button
                         className="delete"
                         type="button"

@@ -179,6 +179,21 @@ footer {
   font-size: 0.9rem;
 }
 
+/* Nouvelle fonctionnalité */
+.delete-completed {
+  padding: 8px 12px;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  background: #fff;
+  color: #b42318;
+  font-weight: 600;
+}
+
+.delete-completed:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 @media (max-width: 650px) {
   .container {
     padding-top: 32px;

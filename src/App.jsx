@@ -66,6 +66,11 @@ function App() {
     saveTasks(tasks.filter((task) => task.id !== id));
   }
 
+  // Nouvelle fonctionnalité
+  function deleteCompletedTasks() {
+    saveTasks(tasks.filter((task) => !task.completed));
+  }
+
   const visibleTasks = useMemo(
     () => filterTasks(tasks, filter),
     [tasks, filter]
@@ -77,7 +82,9 @@ function App() {
     <main className="container">
       <header className="hero">
         <p className="eyebrow">GitHub Team Workshop</p>
+
         <h1>Team Tasks</h1>
+
         <p>
           Une petite application React pour apprendre à travailler en équipe
           comme en entreprise.
@@ -87,6 +94,7 @@ function App() {
       <section className="card">
         <form className="task-form" onSubmit={handleSubmit}>
           <label htmlFor="task-title">Nouvelle tâche</label>
+
           <div className="form-row">
             <input
               id="task-title"
@@ -94,14 +102,22 @@ function App() {
               onChange={(event) => setTitle(event.target.value)}
               placeholder="Ex. Ajouter un test"
             />
-            <button type="submit">Ajouter</button>
+
+            <button type="submit">
+              Ajouter
+            </button>
           </div>
         </form>
 
         <div className="toolbar">
-          <strong>{remainingCount} tâche(s) restante(s)</strong>
+          <strong>
+            {remainingCount} tâche(s) restante(s)
+          </strong>
 
-          <div className="filters" aria-label="Filtrer les tâches">
+          <div
+            className="filters"
+            aria-label="Filtrer les tâches"
+          >
             <button
               className={filter === "all" ? "active" : ""}
               onClick={() => setFilter("all")}
@@ -109,6 +125,7 @@ function App() {
             >
               Toutes
             </button>
+
             <button
               className={filter === "todo" ? "active" : ""}
               onClick={() => setFilter("todo")}
@@ -116,6 +133,7 @@ function App() {
             >
               À faire
             </button>
+
             <button
               className={filter === "done" ? "active" : ""}
               onClick={() => setFilter("done")}
@@ -124,20 +142,35 @@ function App() {
               Terminées
             </button>
           </div>
+
+          {/* Nouvelle fonctionnalité */}
+          <button
+            className="delete-completed"
+            type="button"
+            onClick={deleteCompletedTasks}
+            disabled={!tasks.some((task) => task.completed)}
+          >
+            Supprimer les terminées
+          </button>
         </div>
 
         <ul className="task-list">
           {visibleTasks.length === 0 ? (
-            <li className="empty">Aucune tâche dans cette catégorie.</li>
+            <li className="empty">
+              Aucune tâche dans cette catégorie.
+            </li>
           ) : (
             visibleTasks.map((task) => (
               <li className="task" key={task.id}>
-                <label className={task.completed ? "completed" : ""}>
+                <label
+                  className={task.completed ? "completed" : ""}
+                >
                   <input
                     type="checkbox"
                     checked={task.completed}
                     onChange={() => toggleTask(task.id)}
                   />
+
                   <span>{task.title}</span>
                 </label>
 

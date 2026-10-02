@@ -170,6 +170,58 @@ button {
   border-radius: 12px;
 }
 
+.card + .card {
+  margin-top: 20px;
+}
+
+.profile-form {
+  display: grid;
+  gap: 8px;
+}
+
+.profile-form h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+
+.profile-form label {
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.profile-form input {
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  outline: none;
+}
+
+.profile-form input:focus {
+  border-color: #667085;
+}
+
+.profile-form button {
+  justify-self: start;
+  margin-top: 12px;
+  padding: 13px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #172033;
+  color: white;
+  font-weight: 700;
+}
+
+.form-message {
+  margin: 4px 0 0;
+  color: #067647;
+  font-weight: 600;
+}
+
+.form-message.error {
+  color: #b42318;
+}
+
 footer {
   display: flex;
   justify-content: center;
@@ -196,5 +248,9 @@ footer {
 
   .filters {
     flex-wrap: wrap;
+  }
+
+  .profile-form button {
+    justify-self: stretch;
   }
 }

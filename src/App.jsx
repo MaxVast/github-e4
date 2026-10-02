@@ -1,17 +1,21 @@
-
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from "./page/Home/Home";
+import Login from "./page/Login/Login";
+import UserProvider from "./user/UserProvider";
 
 
 function App() {
 
   return (
-    <BrowserRouter>
-      <Routes>  
-        <Route path='/a' element={<Home/>} />
-      </Routes>
-    </BrowserRouter>
+    <UserProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/a' element={<Home/>} />
+          <Route path='/login' element={<Login/>} />
+        </Routes>
+      </BrowserRouter>
+    </UserProvider>
   );
 }
 

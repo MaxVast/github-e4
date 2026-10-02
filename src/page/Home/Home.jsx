@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import ThemeToggle from "../../components/ThemeToggle";
 
 const initialTasks = [
   {
@@ -145,6 +146,7 @@ function Home() {
   return (
     <main className="container">
       <header className="hero">
+        <ThemeToggle />
         <p className="eyebrow">GitHub Team Workshop</p>
         <h1>Team Tasks</h1>
         <p>

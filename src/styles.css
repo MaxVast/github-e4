@@ -102,6 +102,17 @@ button {
   margin: 28px 0 14px;
 }
 
+.counters {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.counters span {
+  color: #667085;
+  font-size: 0.9rem;
+}
+
 .filters {
   display: flex;
   gap: 6px;

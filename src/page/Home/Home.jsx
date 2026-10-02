@@ -1,10 +1,38 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
 const initialTasks = [
-  { id: 1, title: "Découvrir le projet", completed: true },
-  { id: 2, title: "Créer ma première branche", completed: false },
-  { id: 3, title: "Ouvrir une Pull Request", completed: false },
+  {
+    id: 1,
+    title: "Découvrir le projet",
+    description: "Lire le CONTRIBUTING.md et lancer l'application en local.",
+    completed: true,
+    createdAt: "2026-10-01T09:00:00.000Z",
+    dueDate: "2026-10-01",
+  },
+  {
+    id: 2,
+    title: "Créer ma première branche",
+    description: "Respecter la convention feature/..., fix/... ou docs/...",
+    completed: false,
+    createdAt: "2026-10-01T09:00:00.000Z",
+    dueDate: "2026-10-03",
+  },
+  {
+    id: 3,
+    title: "Ouvrir une Pull Request",
+    description: "Référencer l'Issue avec Closes #n et demander une revue.",
+    completed: false,
+    createdAt: "2026-10-01T09:00:00.000Z",
+    dueDate: "2026-10-09",
+  },
 ];
+
+export function loadTasks() {
+  const savedTasks = localStorage.getItem("team-tasks");
+
+  return savedTasks ? JSON.parse(savedTasks) : initialTasks;
+}
 
 export function filterTasks(tasks, filter) {
   if (filter === "todo") {
@@ -24,22 +52,27 @@ export function deleteTask(id) {
   }
 }
 
-export function createTask(title, id = Date.now()) {
+export function createTask(
+  title,
+  id = Date.now(),
+  { description = "", dueDate = "", createdAt = new Date().toISOString() } = {},
+) {
   return {
     id,
     title: title.trim(),
+    description: description.trim(),
     completed: false,
+    createdAt,
+    dueDate,
   };
 }
 
 function Home() {
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem("team-tasks");
-
-    return savedTasks ? JSON.parse(savedTasks) : initialTasks;
-  });
+  const [tasks, setTasks] = useState(loadTasks);
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [filter, setFilter] = useState("all");
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
@@ -57,8 +90,10 @@ function Home() {
       return;
     }
 
-    saveTasks([...tasks, createTask(title)]);
+    saveTasks([...tasks, createTask(title, Date.now(), { description, dueDate })]);
     setTitle("");
+    setDescription("");
+    setDueDate("");
   }
 
   function toggleTask(id) {
@@ -130,6 +165,23 @@ function Home() {
             />
             <button type="submit">Ajouter</button>
           </div>
+
+          <label htmlFor="task-description">Description</label>
+          <textarea
+            id="task-description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Détails de la tâche (optionnel)"
+            rows={2}
+          />
+
+          <label htmlFor="task-due-date">Échéance</label>
+          <input
+            id="task-due-date"
+            type="date"
+            value={dueDate}
+            onChange={(event) => setDueDate(event.target.value)}
+          />
         </form>
 
         <div className="toolbar">
@@ -196,6 +248,9 @@ function Home() {
                     </label>
 
                     <div className="task-actions">
+                      <Link className="details-link" to={`/tasks/${task.id}`}>
+                        Détails
+                      </Link>
                       <button
                         type="button"
                         onClick={() => startEditing(task)}
